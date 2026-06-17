@@ -1,21 +1,18 @@
-# Ahí Viene · Dual UI v4 Secciones
+# Ahí Viene · GPS real v4
 
-Versión basada en la v4 real, con dos interfaces en el mismo proyecto.
+Base estable de RutaDirecta Link, pero con estos cambios:
 
-## Cambios principales
-
-- Vista PC con paneles laterales.
-- Vista celular con secciones inferiores: Mapa, Rutas, Compartir, Reportar y Comunidad.
-- En celular, el mapa queda limpio cuando estás en la sección Mapa.
 - Compartir GPS real cada 2 segundos.
-- Los reportes usan tu ubicación GPS exacta.
-- Ver ruta abre RutaDirecta.
-- Sin usuarios falsos, sin camiones falsos y sin trazos inventados.
+- La ruta elegida solo etiqueta tu viaje; no mueve tu ubicación a ningún trazo.
+- Tu marcador aparece como círculo con el código de ruta.
+- El reporte comunitario se publica exactamente donde estás usando GPS.
+- Ya no existe elegir punto manual para reportes.
+- Ver ruta abre RutaDirecta con la ruta seleccionada.
+- Servidor disponible en `0.0.0.0` para verlo desde celular en la misma WiFi.
 
-## Ejecutar
+## Correr
 
 ```bat
-cd C:\Users\ariel\Downloads\ahi-viene-dual-ui-v4-secciones\ahi-viene-dual-ui-v4-secciones
 npm install
 npm start
 ```
@@ -23,13 +20,11 @@ npm start
 Abrir:
 
 ```txt
-http://localhost:3021
+http://localhost:3018
 ```
 
-Vistas directas:
+Desde celular en la misma red:
 
 ```txt
-http://localhost:3021/?view=mobile
-http://localhost:3021/?view=desktop
-http://localhost:3021/?view=mobile&section=rutas
+http://IP_DE_TU_LAPTOP:3018
 ```

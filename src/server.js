@@ -8,7 +8,7 @@ const { Server } = require('socket.io');
 const { getDb, writeDb, resetDb, DB_PATH, DB_VERSION } = require('./db');
 const { ROUTES, routeById, CENTER } = require('./routeCatalog');
 
-const PORT = Number(process.env.PORT || 3021);
+const PORT = Number(process.env.PORT || 3018);
 const JWT_SECRET = process.env.JWT_SECRET || 'dev-secret-cambia-esto-para-produccion';
 const ACTIVE_TTL_MS = 1000 * 18;
 
@@ -262,7 +262,7 @@ setInterval(() => emitState(), 15000).unref();
 
 server.listen(PORT, '0.0.0.0', () => {
   getDb();
-  console.log(`Ahí Viene Dual UI listo en http://localhost:${PORT}`);
+  console.log(`Ahí Viene GPS real listo en http://localhost:${PORT}`);
   console.log(`También en red local: http://TU_IP:${PORT}`);
   console.log(`DB: ${DB_PATH}`);
   console.log(`Rutas cargadas: ${ROUTES.length}`);

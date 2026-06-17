@@ -7,55 +7,13 @@ const state = {
   map: null, routeLayer: null, stopLayer: null, routeFocusLayer: null, userLayer: null, reportLayer: null, searchLayer: null,
   routeLines: new Map(), selectedRouteId: null, selectedReportPoint: null, manualPoint: null,
   watchId: null, gpsTimer: null, gpsBusy: false, lastGpsPoint: null, sharing: false,
-  viewMode: localStorage.getItem('ahi_view_mode') || 'auto',
   focusedRouteId: null, focusedRouteGeometry: null,
-  toggles: { routes: true, stops: true, users: true, reports: true },
-  mobileSection: 'map'
+  toggles: { routes: true, stops: true, users: true, reports: true }
 };
 
 const typeLabels = { full: 'Unidad llena', delay: 'Retraso', detour: 'Desvío', incident: 'Incidente', normal: 'Todo normal', info: 'Información' };
 const typeColors = { full: '#f59e0b', delay: '#f97316', detour: '#38bdf8', incident: '#ef4444', normal: '#22c55e', info: '#a78bfa' };
 const ROUTE_STYLE_VERSION = 'lineas-pro-v1';
-
-
-function setViewMode(mode, persist = true) {
-  if (!['auto', 'mobile', 'desktop'].includes(mode)) mode = 'auto';
-  state.viewMode = mode;
-  document.body.classList.toggle('force-mobile', mode === 'mobile');
-  document.body.classList.toggle('force-desktop', mode === 'desktop');
-  $$('.view-switch button').forEach((btn) => btn.classList.remove('active'));
-  const active = mode === 'mobile' ? $('#view-mobile') : mode === 'desktop' ? $('#view-desktop') : $('#view-auto');
-  if (active) active.classList.add('active');
-  if (persist) localStorage.setItem('ahi_view_mode', mode);
-  setTimeout(() => { if (state.map) state.map.invalidateSize(); }, 140);
-}
-
-function initViewMode() {
-  const params = new URLSearchParams(location.search);
-  const requested = (params.get('view') || params.get('vista') || '').toLowerCase();
-  if (['mobile', 'celular'].includes(requested)) return setViewMode('mobile', true);
-  if (['desktop', 'pc', 'escritorio'].includes(requested)) return setViewMode('desktop', true);
-  setViewMode(state.viewMode || 'auto', false);
-}
-
-function setMobileSection(section) {
-  if (!['map', 'routes', 'share', 'report', 'community'].includes(section)) section = 'map';
-  state.mobileSection = section;
-  ['map', 'routes', 'share', 'report', 'community', 'alerts'].forEach((name) => {
-    document.body.classList.toggle(`mobile-section-${name}`, name === section);
-  });
-  $$('.mobile-section-nav button').forEach((btn) => {
-    btn.classList.toggle('active', btn.dataset.mobileSection === section);
-  });
-  setTimeout(() => { if (state.map) state.map.invalidateSize(); }, 140);
-}
-
-function initMobileSection() {
-  const params = new URLSearchParams(location.search);
-  const requested = (params.get('section') || params.get('seccion') || 'map').toLowerCase();
-  const map = { mapa: 'map', rutas: 'routes', compartir: 'share', reportar: 'report', comunidad: 'community' };
-  setMobileSection(map[requested] || requested || 'map');
-}
 
 function setText(el, text) { if (el) el.textContent = text; }
 function toast(message, ms = 2800) { const t = $('#toast'); t.textContent = message; t.classList.remove('hidden'); clearTimeout(toast.timer); toast.timer = setTimeout(() => t.classList.add('hidden'), ms); }
@@ -102,8 +60,6 @@ async function enterApp() {
   $('#auth').classList.add('hidden'); $('#app').classList.remove('hidden');
   $('#session-name').textContent = `${state.user.name} · ${state.user.email}`;
   initMap();
-  initViewMode();
-  initMobileSection();
   await loadRoutes();
   await refreshHealth();
   connectSocket();
@@ -617,11 +573,7 @@ function bindEvents() {
   $('#go-destination').addEventListener('click', searchDestination);
   $('#destination').addEventListener('keydown', (e) => { if (e.key === 'Enter') searchDestination(); });
   $('#locate').addEventListener('click', locateMe);
-  $('#fit-routes').addEventListener('click', () => { if (state.allBounds) state.map.fitBounds(state.allBounds, { padding: [70, 70] }); else toast('Las rutas oficiales se abren en RutaDirecta desde Ver ruta.'); });
-  if ($('#view-auto')) $('#view-auto').addEventListener('click', () => setViewMode('auto'));
-  if ($('#view-mobile')) $('#view-mobile').addEventListener('click', () => setViewMode('mobile'));
-  if ($('#view-desktop')) $('#view-desktop').addEventListener('click', () => setViewMode('desktop'));
-  $$('.mobile-section-nav button').forEach((btn) => btn.addEventListener('click', () => setMobileSection(btn.dataset.mobileSection)));
+  $('#fit-routes').addEventListener('click', () => { if (state.allBounds) state.map.fitBounds(state.allBounds, { padding: [70, 70] }); });
   $('#refresh-health').addEventListener('click', refreshHealth);
   const clearFocusBtn = $('#clear-route-focus');
   if (clearFocusBtn) clearFocusBtn.addEventListener('click', clearRouteFocus);
@@ -629,7 +581,7 @@ function bindEvents() {
 }
 
 (async function init() {
-  bindEvents(); initViewMode(); switchAuthMode('login');
+  bindEvents(); switchAuthMode('login');
   const ok = await loadSession();
   if (ok) await enterApp();
 })();
